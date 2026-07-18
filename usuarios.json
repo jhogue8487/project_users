@@ -1,5 +1,26 @@
 [
-  { "nombre": "Pepe", "edad": 25, "correo": "pepe@gmail.com" },
-  { "nombre": "Ana", "edad": 15, "correo": "ana@gmail.com" },
-  { "nombre": "Lady", "edad": 14, "correo": "lady@gmail.com" }
+  {
+    "id": 1,
+    "nombre": "Pepe",
+    "edad": 25,
+    "correo": "pepe@gmail.com"
+  },
+  {
+    "id": 2,
+    "nombre": "Ana",
+    "edad": 15,
+    "correo": "ana@gmail.com"
+  },
+  {
+    "id": 3,
+    "nombre": "Lady",
+    "edad": 14,
+    "correo": "lady@gmail.com"
+  },
+  {
+    "nombre": "marce",
+    "edad": 18,
+    "correo": "marce@gmail.com",
+    "id": 4
+  }
 ]
