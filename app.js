@@ -2,6 +2,7 @@ import express from "express";
 import "dotenv/config"; //esto importa y ejecuta en una sola linea
 import fs from "fs";
 import path from "path";
+import { validarUsuario } from "./validaciones.js";
 
 const app = express();
 const port = process.env.PORT || 3030;
@@ -44,11 +45,17 @@ app.post("/usuarios", (req, res) => {
         .json({ error: "No se puedo leer el archivo, o conexion BD" });
     }
     const usuarios = JSON.parse(datos); //objeto
+
     //id
     const maxId = usuarios.reduce((max, usuario) => {
       return usuario.id > max ? usuario.id : max;
     }, 0);
     nuevo_usuario.id = maxId + 1;
+    //variable para validar
+    const validar = validarUsuario(nuevo_usuario, usuarios);
+    if (!validar.isValid) {
+      return res.status(400).json({ error: validar.error });
+    }
     usuarios.push(nuevo_usuario);
     fs.writeFile(ruta_archivo, JSON.stringify(usuarios, null, 2), (err) => {
       if (err) {
@@ -97,6 +104,8 @@ app.patch("/usuarios/:id", (req, res) => {
     );
   });
 });
+
+//
 
 app.listen(port, () => {
   console.log(`SERVIDOR EN: http://localhost:${port}/`);
