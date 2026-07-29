@@ -81,6 +81,12 @@ app.patch("/usuarios/:id", (req, res) => {
     //parseamos datos
     let lista_usuarios = JSON.parse(datos);
 
+    //validar usuario
+    const validar = validarUsuario(usuario_editar, lista_usuarios);
+    if (!validar.isValid) {
+      return res.status(400).json({ error: validar.error });
+    }
+
     //actualizar usuari que conicida con ID
     lista_usuarios = lista_usuarios.map((usuario) => {
       return usuario.id === usuario_id
