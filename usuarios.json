@@ -18,9 +18,27 @@
     "correo": "lady@gmail.com"
   },
   {
-    "nombre": "ma",
+    "nombre": "marce",
     "edad": 18,
-    "correo": "marcela@gmail.com",
-    "id": 4
+    "correo": "marce@gmail.com",
+    "id": 2
+  },
+  {
+    "nombre": "cyon",
+    "edad": 10,
+    "correo": "cyon@sena.edu",
+    "id": 5
+  },
+  {
+    "nombre": "cami",
+    "edad": 11,
+    "correo": "cami@sena.edu",
+    "id": 6
+  },
+  {
+    "nombre": "cami",
+    "edad": 11,
+    "correo": "cami@sena.edu",
+    "id": 7
   }
 ]

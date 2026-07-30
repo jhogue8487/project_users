@@ -6,7 +6,7 @@ function esValidoEmail(email) {
 
 // Validación de nombre (mínimo 3 caracteres)
 function esValidoNombre(nombre) {
-  return typeof name === "string" && name.length >= 3;
+  return typeof nombre === "string" && nombre.length >= 3;
 }
 
 // Validación de ID (numérico y único)
@@ -18,16 +18,21 @@ function esValidoId(id, usuarios) {
 
 //Funcion principal
 function validarUsuario(usuario, usuarios) {
-  const errores = [];
-  if (!esValidoNombre(usuario.nombre)) {
-    errores.push("El nombre debe tener tres caracteres.");
+  const { nombre, correo, id } = usuario;
+  if (!esValidoNombre(nombre)) {
+    return {
+      esValido: false,
+      error: `El nombre '${nombre}' debe tener tres caracteres.`,
+    };
   }
-  if (!esValidoEmail(usuario.email)) {
-    errores.push("El correo electronico no es valido.");
+  if (!esValidoEmail(correo)) {
+    return {
+      esValido: false,
+      error: `El correo electronico "${correo}" no es valido.`,
+    };
   }
   return {
-    esValido: errores.length === 0,
-    errores: errores,
+    esValido: true,
   };
 }
 export { esValidoEmail, esValidoNombre, validarUsuario };

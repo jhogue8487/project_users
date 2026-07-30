@@ -53,7 +53,8 @@ app.post("/usuarios", (req, res) => {
     nuevo_usuario.id = maxId + 1;
     //variable para validar
     const validar = validarUsuario(nuevo_usuario, usuarios);
-    if (!validar.isValid) {
+
+    if (!validar.esValido) {
       return res.status(400).json({ error: validar.error });
     }
     usuarios.push(nuevo_usuario);
@@ -83,7 +84,8 @@ app.patch("/usuarios/:id", (req, res) => {
 
     //validar usuario
     const validar = validarUsuario(usuario_editar, lista_usuarios);
-    if (!validar.isValid) {
+    console.log(validar);
+    if (!validar.esValido) {
       return res.status(400).json({ error: validar.error });
     }
 
