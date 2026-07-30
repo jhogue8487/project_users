@@ -53,8 +53,9 @@ app.post("/usuarios", (req, res) => {
     nuevo_usuario.id = maxId + 1;
     //variable para validar
     const validar = validarUsuario(nuevo_usuario, usuarios);
-    if (!validar.isValid) {
-      return res.status(400).json({ error: validar.error });
+
+    if (!validar.esValido) {
+      return res.status(400).json({ error: validar.errores });
     }
     usuarios.push(nuevo_usuario);
     fs.writeFile(ruta_archivo, JSON.stringify(usuarios, null, 2), (err) => {
