@@ -1,0 +1,5 @@
+[
+  { "cc": 1, "nombre": "juan", "email": "juan@gmail.com" },
+  { "cc": 2, "nombre": "juana", "email": "juana@gmail.com" },
+  { "cc": 13, "nombre": "ana", "email": "ana@gmail.com" }
+]
