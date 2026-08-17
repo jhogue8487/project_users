@@ -33,7 +33,7 @@ app.get(["/api/aprendiz", "/api/aprendiz/:cc"], (req, res) => {
     if (err) {
       return res.status(500).json({ Error: "Error conexion bd." });
     }
-    const aprendiz = JSON.parse(datos).filter((a) => a.cc == aprendizCc);
+    const aprendiz = JSON.parse(datos).find((a) => a.cc == aprendizCc);
     res.json({ Aprendiz: aprendiz.length > 0 ? aprendiz : "sin datos" });
   });
 });
@@ -89,6 +89,12 @@ app.patch("/api/aprendiz/:cc", (req, res) => {
       },
     );
   });
+});
+
+//eliminar un aprendiz
+app.delete("/api/aprendiz/:cc", (req, res) => {
+  const aprendizCc = parseInt(req.params.cc);
+  res.json({ mensaje: "trabajdno en delete" });
 });
 
 //escucha el puerto donde despliega el servidor
