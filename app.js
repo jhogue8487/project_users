@@ -2,6 +2,7 @@ const express = require("express");
 require("dotenv/config");
 
 const app = express();
+app.use(express.json());
 const PORT = process.env.PORT || 3000;
 //datos para leer archivo
 //const listaAprendices = require("./aprendices.json");//manera sincrona
@@ -38,6 +39,57 @@ app.get(["/api/aprendiz", "/api/aprendiz/:cc"], (req, res) => {
 });
 
 //adicionar un aprendiz
+app.post("/api/aprendices", (req, res) => {
+  //en este endpoint falta validar datos como correo
+  //capturar datos del nuevo aprendiz
+  const nuevoAprendiz = req.body;
+  //leer archivo
+  sisArchivo.readFile(rutaArchivoJson, "utf-8", (err, datos) => {
+    if (err) {
+      return res.json({ Error: "Error conexin bd." });
+    }
+    const listaAprendices = JSON.parse(datos);
+    listaAprendices.push(nuevoAprendiz);
+    sisArchivo.writeFile(
+      rutaArchivoJson,
+      JSON.stringify(listaAprendices, null, 2),
+      (err) => {
+        if (err) {
+          return res.json({ Error: "Error al guardar el usuario." });
+        }
+        res.status(201).json({ Aprendiz: nuevoAprendiz });
+      },
+    );
+  });
+});
+
+//editar el aprendiz
+app.patch("/api/aprendiz/:cc", (req, res) => {
+  const aprendizCc = parseInt(req.params.cc, 10);
+  const datosModificar = req.body;
+  console.log(aprendizCc, datosModificar);
+  sisArchivo.readFile(rutaArchivoJson, "utf-8", (err, datos) => {
+    if (err) {
+      return res.status(500).json({ Error: "Error conexion bd." });
+    }
+    let listaAprendices = JSON.parse(datos);
+    listaAprendices = listaAprendices.map((a) =>
+      a.cc === aprendizCc ? { ...a, ...datosModificar } : a,
+    );
+    sisArchivo.writeFile(
+      rutaArchivoJson,
+      JSON.stringify(listaAprendices, null, 2),
+      (err) => {
+        if (err) {
+          return res
+            .status(500)
+            .json({ Error: "Error al actualizar usuario." });
+        }
+        res.status(200).json(datosModificar);
+      },
+    );
+  });
+});
 
 //escucha el puerto donde despliega el servidor
 app.listen(PORT, () => {
