@@ -2,14 +2,33 @@ const express = require("express");
 require("dotenv/config");
 
 const app = express();
+//middleware validar informacion json y form
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 const PORT = process.env.PORT || 3000;
 //datos para leer archivo
 //const listaAprendices = require("./aprendices.json");//manera sincrona
 const sisArchivo = require("fs");
 const ruta = require("path");
 const rutaArchivoJson = ruta.join(__dirname, "aprendices.json");
+//libreria para cargar imagenes
+const multer = require("multer");
 
+//configuracion de almacenamiento
+const almacenamiento = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "imagenes/");
+  },
+  filename: (req, file, cb) => {
+    const extension = ruta.extname(file.originalname);
+    cb(null, `${Date.now()}${extension}`);
+  },
+});
+
+const cargar = multer({ storage: almacenamiento });
+
+//ENDPOINTS
 app.get("/", (req, res) => {
   res.send("Api de aprendices");
 });
@@ -25,7 +44,7 @@ app.get("/api/aprendices", (req, res) => {
   });
 });
 
-//listar un aprendiz
+//listar un aprendiz, existe un bug con >0
 app.get(["/api/aprendiz", "/api/aprendiz/:cc"], (req, res) => {
   const aprendizCc = req.params.cc || 10001;
   //res.send(`EL aprendiz tiene el numero de identifiacion: ${aprendizCc}`);
@@ -39,10 +58,16 @@ app.get(["/api/aprendiz", "/api/aprendiz/:cc"], (req, res) => {
 });
 
 //adicionar un aprendiz
-app.post("/api/aprendices", (req, res) => {
+app.post("/api/aprendices", cargar.single("imagen"), (req, res) => {
   //en este endpoint falta validar datos como correo
   //capturar datos del nuevo aprendiz
   const nuevoAprendiz = req.body;
+  if (!nuevoAprendiz) {
+    return res.status(400).json({ Error: "No se enviaron datos" });
+  }
+  nuevoAprendiz.avatar = req.file
+    ? `/imagenes/${req.file.filename}`
+    : "sin imagen";
   //leer archivo
   sisArchivo.readFile(rutaArchivoJson, "utf-8", (err, datos) => {
     if (err) {
