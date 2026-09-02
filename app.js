@@ -3,9 +3,12 @@ require("dotenv/config");
 
 const app = express();
 const registroMiddleware = require("./middleware/registroMiddleware");
+const manejoErrMiddleware = require("./middleware/manejoErrMiddleware");
 //middleware validar informacion json y form
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(registroMiddleware);
+app.use(manejoErrMiddleware);
 
 const PORT = process.env.PORT || 3000;
 //datos para leer archivo
@@ -135,6 +138,10 @@ app.patch("/api/aprendiz/:cc", (req, res) => {
 app.delete("/api/aprendiz/:cc", (req, res) => {
   const aprendizCc = parseInt(req.params.cc);
   res.json({ mensaje: "trabajdno en delete" });
+});
+
+app.get("/error", (req, res, next) => {
+  next(new Error("Error provocado"));
 });
 
 //escucha el puerto donde despliega el servidor
