@@ -2,6 +2,7 @@ const express = require("express");
 require("dotenv/config");
 
 const app = express();
+const registroMiddleware = require("./middleware/registroMiddleware");
 //middleware validar informacion json y form
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -28,9 +29,23 @@ const almacenamiento = multer.diskStorage({
 
 const cargar = multer({ storage: almacenamiento });
 
+//middleware, se ejecuta c/que se realiza una peticion, no tiene ruta.
+app.use((req, res, next) => {
+  const tiempoEnMilisegundos = Date.now();
+  const fechaGMT = new Date(tiempoEnMilisegundos);
+  console.log(`"Milesegundos": ${tiempoEnMilisegundos}
+  "Fecha": ${fechaGMT}`);
+  next();
+});
+
+//middleware registro, registrar que peticion se hizo
+//se realizo el codigo aqui
+
+app.use(registroMiddleware);
+
 //ENDPOINTS
 app.get("/", (req, res) => {
-  res.send("Api de aprendices");
+  res.send("Api de aprendices.");
 });
 
 //listar todos los aprendices
