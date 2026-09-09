@@ -2,13 +2,15 @@ const express = require("express");
 require("dotenv/config");
 
 const app = express();
-const registroMiddleware = require("./middleware/registroMiddleware");
-const manejoErrMiddleware = require("./middleware/manejoErrMiddleware");
+const registroMiddleware = require("./src/middleware/registroMiddleware");
+const manejoErrMiddleware = require("./src/middleware/manejoErrMiddleware");
+const autenticacionMiddle = require("./src/middleware/autenticacion");
+const jwtoken = require("jsonwebtoken");
+
 //middleware validar informacion json y form
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(registroMiddleware);
-app.use(manejoErrMiddleware);
 
 const PORT = process.env.PORT || 3000;
 //datos para leer archivo
@@ -143,6 +145,33 @@ app.delete("/api/aprendiz/:cc", (req, res) => {
 app.get("/error", (req, res, next) => {
   next(new Error("Error provocado"));
 });
+
+app.get("/api/rutaprotegida", autenticacionMiddle, (req, res, next) => {
+  res.json({ mensaje: "Ruta protegida" });
+});
+
+app.post("/api/login", (req, res) => {
+  const { username, password } = req.body;
+  const usuario = {
+    id: 111,
+    perfil: "aprendiz",
+    usernamebd: "jogm",
+    passwordbd: "abc123",
+  };
+  if (username !== usuario.usernamebd || password !== usuario.passwordbd) {
+    res.status(400).json({ mensaje: "usuario o contraseña incorrectos" });
+  }
+  console.log(`Datos usuario json : ${username} - ${password}`);
+  const token = jwtoken.sign(
+    { id: usuario.id, perfil: usuario.perfil },
+    process.env.JWT_SECRET,
+    { expiresIn: "4h" },
+    console.log(usuario),
+  );
+  res.json({ token });
+});
+
+app.use(manejoErrMiddleware);
 
 //escucha el puerto donde despliega el servidor
 app.listen(PORT, () => {
