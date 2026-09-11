@@ -11,7 +11,7 @@ const enrutador = Router();
 
 //este enrutado se comunica con el controlador (endpoint registrar nuevo de app), y el controlador con el servicio
 enrutador.post("/registro", registrar);
-enrutador.post("/isesion", iniciarSesion);
+enrutador.post("/login", iniciarSesion);
 
 enrutador.get("/api/rutaprotegida", autenticarToken, (req, res, next) => {
   res.json({ mensaje: "Ruta protegida" });
