@@ -19,30 +19,17 @@ const registrar = async (req, res) => {
   }
 };
 
-function ingresar(req, res) {
-  const datos = req.body;
-  if (!datos)
-    return res.status(400).json({ mensaje: "Usuario y clave obligatorios" });
-  //bd simulada
-  const bd = { user: "jogm", pass: "123" };
-  if (datos.usuario !== bd.user || datos.clave !== bd.pass) {
-    res.json({ mensaje: "Credenciales incorrectas" });
+//separamos la logica de la logica del negocio
+async function ingresar(req, res) {
+  try {
+    const { usuario, clave } = req.body;
+    //funcion del servicio
+    const token = await ingresarUsuario(usuario, clave);
+    //puedes enviar mas informacion como avatar usuario
+    res.json(token);
+  } catch (error) {
+    return res.status(400).json({ error: error.message });
   }
-  const token = jwt.sign({ usuario: datos.usuario }, process.env.JWT_SECRET, {
-    expiresIn: "2h",
-  });
-  res.json({ token });
 }
 
 module.exports = { registrar, ingresar };
-
-// try {
-//   const { usuario, clave } = req.body;
-//   //funcion del servicio
-//   const token = await ingresarUsuario(usuario, clave);
-
-//   //puedes enviar mas informacion como avatar usuario
-//   res.json(token);
-// } catch (error) {
-//   return res.status(400).json({ error: error.message });
-// }

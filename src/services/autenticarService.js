@@ -1,7 +1,8 @@
 //logica de negocio
 const encriptacion = require("bcryptjs");
 const jwtoken = require("jsonwebtoken");
-//importar orm
+const usuarioBd = require("../models/usuario");
+//importar orm, para comunicarse
 //const { PrismaClient } = require("@prisma/client");
 //instanciar orm
 //const ormPrisma = new PrismaClient();
@@ -18,7 +19,7 @@ const registrarUsuario = async (nombre, nombreUsuario, correo, clave) => {
   return "Trabajando en el registro de usuario con baseD";
 };
 
-const ingresarUsuario = async (nombreUsuario, clave) => {
+const ingresarUsuario = async (usuario, clave) => {
   //   const usuario = await prisma.usuario.findUnique({ where: { nombreUsuario } });
   //   if (!usuario) {
   //     throw new Error("Usuario y/o contraseña incorrectos.");
@@ -27,18 +28,13 @@ const ingresarUsuario = async (nombreUsuario, clave) => {
   //   if (!validarClave) {
   //     throw new Error("Usuario y/o contraseña incorrectos.");
   //   }
-  const { username, password } = req.body;
-  const usuario = {
-    id: 111,
-    perfil: "aprendiz",
-    usernamebd: "jogm",
-    passwordbd: "abc123",
-  };
-  if (username !== usuario.usernamebd || password !== usuario.passwordbd) {
-    res.status(400).json({ mensaje: "usuario o contraseña incorrectos" });
+  //const { username, password } = req.body;
+
+  if (usuarioBd.usuario !== usuario || usuarioBd.clave !== clave) {
+    throw new Error("usuario o contraseña incorrectos");
   }
   const token = jwtoken.sign(
-    { id: usuario.id, perfil: usuario.perfil },
+    { id: usuarioBd.id, perfil: usuarioBd.perfil },
     process.env.JWT_SECRET,
     { expiresIn: "2h" },
   );
