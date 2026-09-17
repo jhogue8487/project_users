@@ -1,0 +1,32 @@
+Tengo errorres en la instalacion
+mis versiones instaladas
+
+Node: v22.20.0
+npm: 10.9.3
+nvm: 0.40.3
+
+prima esta en esta version: 7
+
+NOTA: "
+
+This guide targets prisma@latest, @prisma/orm-postgres@8.0.0-rc.10, @prisma/cli-engine@0.3.0, and @prisma/prisma7@7.10.0-dev.58, with a Prisma ORM 7 baseline on 7.9.1. prisma@latest is the Prisma ORM 8 CLI, 8.0.0-rc.14 at the time of writing. It is versioned and released separately from the ORM packages, so its version number will not match theirs.
+"
+
+
+Limpiar la caché de npm
+Ejecuta `npm cache clean --force` 
+
+Eliminar node_modules y el lockfile
+En la carpeta de tu proyecto, ejecuta `rm -rf node_modules package-lock.json`
+
+Verificar la versión de Node y npm
+Corre `node -v` y `npm -v`. Prisma requiere Node 18 o superior. 
+
+Si tienes una versión muy vieja o muy nueva/inestable, actualízala con nvm (`nvm install --lts` y `nvm use --lts`)
+
+Actualizar npm a la última versión
+Ejecuta `npm install -g npm@latest`. Versiones antiguas de npm tienen bugs conocidos exactamente como este de 'edgesOut'.
+
+Reinstalar dependencias
+npm install
+Corre de nuevo `npm install prisma` (o `npm install` si ya tenías un package.json con más dependencias) y revisa si el error desaparece.
