@@ -3,9 +3,9 @@ const encriptacion = require("bcryptjs");
 const jwtoken = require("jsonwebtoken");
 const usuarioBd = require("../models/usuario");
 //importar orm, para comunicarse
-//const { PrismaClient } = require("@prisma/client");
+const { PrismaClient } = require("@prisma/client");
 //instanciar orm
-//const ormPrisma = new PrismaClient();
+const ormPrisma = new PrismaClient();
 
 //funciones de registro y login
 const registrarUsuario = async (nombre, nombreUsuario, correo, clave) => {

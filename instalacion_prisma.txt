@@ -30,3 +30,8 @@ Ejecuta `npm install -g npm@latest`. Versiones antiguas de npm tienen bugs conoc
 Reinstalar dependencias
 npm install
 Corre de nuevo `npm install prisma` (o `npm install` si ya tenías un package.json con más dependencias) y revisa si el error desaparece.
+
+instalacion de prisma
+npm install prisma --save-dev para el CLI de Prisma como dependencia de desarrollo.
+npm install @prisma/client para el cliente que usarás dentro del código.
+npm install pg como driver oficial de PostgreSQL.
