@@ -35,3 +35,142 @@ instalacion de prisma
 npm install prisma --save-dev para el CLI de Prisma como dependencia de desarrollo.
 npm install @prisma/client para el cliente que usarás dentro del código.
 npm install pg como driver oficial de PostgreSQL.
+
+
+--------------------
+instalacion de prisma 7 porque es compatible con commojs
+
+1. DESINSTALACION:
+
+    npm uninstall prisma @prisma/orm-postgres @prisma/cli-engine
+
+2. Instala Prisma 7
+
+    npm install @prisma/client@7 --save-dev
+    npm install @prisma/client@7 @prisma/adapter-pg@7 pg dotenv
+    npm install -D prisma@7 tsx
+
+    @prisma/adapter-pg es obligatorio en Prisma 7 y pg es el driver que usa. tsx lo necesitas porque el cliente 
+    generado son archivos TypeScript. Con tsx puedes seguir escribiendo tu proyecto en JavaScript CommonJS y 
+    hacer require de esos archivos.
+
+3. Inicializa
+
+    bash
+    npx prisma init --datasource-provider postgresql
+
+    Esto crea prisma/schema.prisma, prisma.config.ts (en 7.10+ puede llamarse prisma7.config.ts, la CLI acepta 
+    ambos) y .env.
+
+4. Configura prisma/schema.prisma
+
+    prisma
+    generator client {
+    provider     = "prisma-client"
+    output       = "../src/generated/prisma"
+    moduleFormat = "cjs"
+    }
+
+    datasource db {
+    provider = "postgresql"
+    }
+
+    model User {
+    id        Int      @id @default(autoincrement())
+    email     String   @unique
+    name      String?
+    createdAt DateTime @default(now())
+    }
+
+    En Prisma 7 el url ya no va en el datasource; lo lee prisma.config.ts desde DATABASE_URL. output 
+    es obligatorio y moduleFormat = "cjs" es lo que evita el conflicto con CommonJS.
+
+5. Pon la conexión en .env
+
+text
+DATABASE_URL="postgresql://usuario:clave@localhost:5432/mibase"
+
+6. Crea las tablas y genera el cliente
+
+bash
+npx prisma migrate dev --name init
+npx prisma generate
+
+Prisma 7 ya no genera el cliente automáticamente, así que generate hay que correrlo explícitamente (y de nuevo 
+cada vez que cambies el schema).
+
+7. Crea src/db.js
+
+javascript
+// src/db.js
+require('dotenv/config');
+const { PrismaPg } = require('@prisma/adapter-pg');
+const { PrismaClient } = require('./generated/prisma/client');
+
+const adapter = new PrismaPg({
+  connectionString: process.env.DATABASE_URL,
+});
+
+const prisma = new PrismaClient({ adapter });
+
+module.exports = prisma;
+
+Un solo archivo exporta una sola instancia, y todos tus services lo reutilizan.
+
+. Úsalo en tu capa de services
+
+javascript
+// src/services/user.service.js
+const prisma = require('../db');
+
+const getAll = () => prisma.user.findMany();
+const getById = (id) => prisma.user.findUnique({ where: { id } });
+const create = (data) => prisma.user.create({ data });
+const update = (id, data) => prisma.user.update({ where: { id }, data });
+const remove = (id) => prisma.user.delete({ where: { id } });
+
+module.exports = { getAll, getById, create, update, remove };
+
+Tus controllers y routers casi no cambian. Solo agrega await y recuerda que id llega como string desde req.params, así que conviértelo con Number(req.params.id).
+
+
+9. Arranca Express y cierra la conexión al apagar
+
+javascript
+// src/index.js
+const express = require('express');
+const prisma = require('./db');
+const userRouter = require('./routers/user.router');
+
+const app = express();
+app.use(express.json());
+app.use('/users', userRouter);
+
+const server = app.listen(3000, () => console.log('Servidor en :3000'));
+
+process.on('SIGTERM', async () => {
+  server.close();
+  await prisma.$disconnect();
+});
+
+10. Scripts en package.json
+
+json
+"scripts": {
+  "dev": "tsx watch src/index.js",
+  "start": "tsx src/index.js",
+  "db:generate": "prisma generate",
+  "db:migrate": "prisma migrate dev"
+}
+
+Ejecuta con npm run dev. Tu package.json no debe tener "type": "module".
+
+Cosas a tener en cuenta
+Agrega src/generated/prisma a .gitignore. Se regenera con npx prisma generate, y tu servidor de despliegue debe 
+correr ese comando antes de arrancar.
+Como el cliente generado es TypeScript, en producción también necesitas tsx (como dependencia normal, no dev) 
+o un paso de compilación.
+Existe además el generador antiguo prisma-client-js, que produce JavaScript en node_modules. En Prisma 7 sigue 
+funcionando pero está marcado como deprecado, así que para un proyecto nuevo no lo usaría.
+Si más adelante quieres Prisma 8, tendrás que pasar el proyecto a ESM. Los modelos de schema.prisma se pueden 
+reutilizar como base del nuevo contract.
