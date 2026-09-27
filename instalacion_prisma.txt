@@ -66,54 +66,55 @@ instalacion de prisma 7 porque es compatible con commojs
 
     prisma
     generator client {
-    provider     = "prisma-client"
-    output       = "../src/generated/prisma"
-    moduleFormat = "cjs"
+      provider     = "prisma-client"
+      output       = "../src/generated/prisma"
+      moduleFormat = "cjs"
     }
 
     datasource db {
-    provider = "postgresql"
+      provider = "postgresql"
     }
 
     model User {
-    id        Int      @id @default(autoincrement())
-    email     String   @unique
-    name      String?
-    createdAt DateTime @default(now())
+      id        Int      @id @default(autoincrement())
+      email     String   @unique
+      name      String?
+      createdAt DateTime @default(now())
     }
 
     En Prisma 7 el url ya no va en el datasource; lo lee prisma.config.ts desde DATABASE_URL. output 
     es obligatorio y moduleFormat = "cjs" es lo que evita el conflicto con CommonJS.
 
+    4.1  Instalar los definiciones de tipo en Node
+      
+      npm install --save-dev @types/node
+
 5. Pon la conexión en .env
 
-text
-DATABASE_URL="postgresql://usuario:clave@localhost:5432/mibase"
+  DATABASE_URL="postgresql://usuario:clave@localhost:5432/mibase"
 
 6. Crea las tablas y genera el cliente
 
-bash
-npx prisma migrate dev --name init
-npx prisma generate
+  npx prisma migrate dev --name init
+  npx prisma generate
 
-Prisma 7 ya no genera el cliente automáticamente, así que generate hay que correrlo explícitamente (y de nuevo 
-cada vez que cambies el schema).
+  Prisma 7 ya no genera el cliente automáticamente, así que generate hay que correrlo explícitamente (y de nuevo 
+  cada vez que cambies el schema).
 
 7. Crea src/db.js
 
-javascript
-// src/db.js
-require('dotenv/config');
-const { PrismaPg } = require('@prisma/adapter-pg');
-const { PrismaClient } = require('./generated/prisma/client');
+  // src/db.js
+  require('dotenv/config');
+  const { PrismaPg } = require('@prisma/adapter-pg');
+  const { PrismaClient } = require('./generated/prisma/client');
 
-const adapter = new PrismaPg({
-  connectionString: process.env.DATABASE_URL,
-});
+  const adapter = new PrismaPg({
+    connectionString: process.env.DATABASE_URL,
+  });
 
-const prisma = new PrismaClient({ adapter });
+  const prisma = new PrismaClient({ adapter });
 
-module.exports = prisma;
+  module.exports = prisma;
 
 Un solo archivo exporta una sola instancia, y todos tus services lo reutilizan.
 
